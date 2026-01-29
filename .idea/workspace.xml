@@ -5,9 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ce9d8555-d679-413f-b50d-93b928f1af71" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/contracts/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/contracts/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/service.discovery.loadbalancer.sidecar/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service-registry/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/service-registry/.gitignore" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,24 +18,28 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="XML Properties File" />
+        <option value="JUnit5 Test Class" />
+        <option value="Class" />
+        <option value="Record" />
+        <option value="Enum" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "jenkem1337"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;jenkem1337&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/jenkem1337/service-discovery.git",
-    "accountId": "b09fe026-d344-4944-a782-4424ae79f980"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/jenkem1337/service-discovery.git&quot;,
+    &quot;accountId&quot;: &quot;b09fe026-d344-4944-a782-4424ae79f980&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -45,41 +49,137 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.App.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/hasan/OneDrive/Masaüstü/service-discovery",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.App.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AppTest.laala.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AppTest.shouldAnswerWithTrue.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.IpAddressTest.createIpAddressRecord.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.IpAddressTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.IpAddressTest.setIncorrectIpAddress.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.NameTest.createNameRecord.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.NameTest.setNullToName.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.PortTest.createPortValueObject.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.PortTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.PortTest.whenPortNumberBiggerThan65535_ShouldThrowIllegalArgumentException.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.PortTest.whenPortNumberNegative_ShouldThrowIllegalArgumentException.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ServiceTest.createServiceObject.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.registry in service-registry.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary&quot;: &quot;JUnit5&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5&quot;: &quot;&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_directory_selection&quot;: &quot;C:/Users/hasan/OneDrive/Masaüstü/service-discovery/service-registry/src/main/java/org/service/registry&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/hasan/OneDrive/Masaüstü/service-discovery/docs/diagrams&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="org.service.registry" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\hasan\OneDrive\Masaüstü\service-discovery\docs\diagrams" />
+      <recent name="C:\Users\hasan\OneDrive\Masaüstü\service-discovery\docs\diagrams\service-registry" />
+      <recent name="C:\Users\hasan\OneDrive\Masaüstü\service-discovery\service.discovery.loadbalancer.sidecar" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\hasan\OneDrive\Masaüstü\service-discovery" />
     </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="org.service.registry" />
+    </key>
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="org.service.registry" />
+    </key>
   </component>
-  <component name="RunManager">
-    <configuration name="App" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="ALTERNATIVE_JRE_PATH" value="openjdk-23" />
-      <option name="MAIN_CLASS_NAME" value="org.service.registry.App" />
-      <module name="service.registry" />
+  <component name="RunManager" selected="JUnit.registry in service-registry">
+    <configuration name="PortTest.createPortValueObject" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="service-registry" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="org.service.registry.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
+      <option name="PACKAGE_NAME" value="org.service.registry" />
+      <option name="MAIN_CLASS_NAME" value="org.service.registry.PortTest" />
+      <option name="METHOD_NAME" value="createPortValueObject" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="PortTest.whenPortNumberBiggerThan65535_ShouldThrowIllegalArgumentException" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="service-registry" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.service.registry.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.service.registry" />
+      <option name="MAIN_CLASS_NAME" value="org.service.registry.PortTest" />
+      <option name="METHOD_NAME" value="whenPortNumberBiggerThan65535_ShouldThrowIllegalArgumentException" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="PortTest.whenPortNumberNegative_ShouldThrowIllegalArgumentException" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="service-registry" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.service.registry.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.service.registry" />
+      <option name="MAIN_CLASS_NAME" value="org.service.registry.PortTest" />
+      <option name="METHOD_NAME" value="whenPortNumberNegative_ShouldThrowIllegalArgumentException" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ServiceTest.createServiceObject" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="service-registry" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.service.registry.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.service.registry" />
+      <option name="MAIN_CLASS_NAME" value="org.service.registry.ServiceTest" />
+      <option name="METHOD_NAME" value="createServiceObject" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="registry in service-registry" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="service-registry" />
+      <option name="TEST_OBJECT" value="directory" />
+      <dir value="$PROJECT_DIR$/service-registry/src/test/java/org/service/registry" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.App" />
+        <item itemvalue="JUnit.registry in service-registry" />
+        <item itemvalue="JUnit.ServiceTest.createServiceObject" />
+        <item itemvalue="JUnit.PortTest.whenPortNumberBiggerThan65535_ShouldThrowIllegalArgumentException" />
+        <item itemvalue="JUnit.PortTest.whenPortNumberNegative_ShouldThrowIllegalArgumentException" />
+        <item itemvalue="JUnit.PortTest.createPortValueObject" />
       </list>
     </recent_temporary>
   </component>
