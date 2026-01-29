@@ -10,9 +10,9 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>service.registry</module>
+        <module>service-registry</module>
         <module>contracts</module>
-        <module>service.discovery.loadbalancer.sidecar</module>
+        <module>service-discovery-loadbalancer-sidecar</module>
     </modules>
 
     <properties>
@@ -20,5 +20,22 @@
         <maven.compiler.target>23</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
+    <dependencyManagement>
+        <dependencies>
+            <!-- Source: https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>5.14.2</version>
+                <scope>test</scope>
+            </dependency>
+            <!-- Source: https://mvnrepository.com/artifact/com.fasterxml.uuid/java-uuid-generator -->
+            <dependency>
+                <groupId>com.fasterxml.uuid</groupId>
+                <artifactId>java-uuid-generator</artifactId>
+                <version>5.2.0</version>
+                <scope>compile</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>
