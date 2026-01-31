@@ -11,9 +11,8 @@ public class Service {
     private Port portNumber;
     private Protocol protocol;
     private final Instant creationDate;
-    private Instant latestHeartBeat;
 
-    private Service(UUID id, UUID serviceId,  Name serviceName, IpAddress ipAddress, Port portNumber, Protocol protocol, Instant creationDate, Instant latestHeartBeat) {
+    private Service(UUID id, UUID serviceId,  Name serviceName, IpAddress ipAddress, Port portNumber, Protocol protocol, Instant creationDate) {
         this.id = id;
         this.serviceId = serviceId;
         this.serviceName = serviceName;
@@ -21,13 +20,37 @@ public class Service {
         this.portNumber = portNumber;
         this.protocol = protocol;
         this.creationDate = creationDate;
-        this.latestHeartBeat = latestHeartBeat;
     }
 
-    public static Service of(UUID id, UUID serviceId,  Name serviceName, IpAddress ipAddress, Port portNumber, Protocol protocol, Instant creationDate, Instant latestHeartBeat) {
-        return new Service(id,serviceId,serviceName,ipAddress,portNumber,protocol,creationDate,latestHeartBeat);
+    public static Service of(UUID id, UUID serviceId,  Name serviceName, IpAddress ipAddress, Port portNumber, Protocol protocol, Instant creationDate) {
+        return new Service(id,serviceId,serviceName,ipAddress,portNumber,protocol,creationDate);
     }
-    public static Service withoutHeartbeatMessage(UUID id, UUID serviceId,  Name serviceName, IpAddress ipAddress, Port portNumber, Protocol protocol, Instant creationDate){
-        return new Service(id,serviceId,serviceName,ipAddress,portNumber,protocol,creationDate,null);
+    public UUID id() {
+        return id;
     }
+
+    public UUID serviceId() {
+        return serviceId;
+    }
+
+    public Name serviceName() {
+        return serviceName;
+    }
+
+    public IpAddress ipAddress() {
+        return ipAddress;
+    }
+
+    public Port portNumber() {
+        return portNumber;
+    }
+
+    public Protocol protocol() {
+        return protocol;
+    }
+
+    public Instant creationDate() {
+        return creationDate;
+    }
+
 }
