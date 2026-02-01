@@ -4,6 +4,6 @@ import java.util.UUID;
 
 public interface ServiceRegistryRepository {
     PutResponse register(Service service);
-    void deregister(UUID serviceId, String serviceName);
-    void heartBeat(long leaseId);
+    DeleteResponse deregister(UUID serviceId, String serviceName);
+    RenewResponse heartBeat(long leaseId);
 }
