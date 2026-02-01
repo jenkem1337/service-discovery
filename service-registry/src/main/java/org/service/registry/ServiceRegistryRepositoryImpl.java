@@ -38,13 +38,13 @@ public class ServiceRegistryRepositoryImpl implements ServiceRegistryRepository{
     }
 
     @Override
-    public void deregister(UUID serviceId, String serviceName) {
+    public DeleteResponse deregister(UUID serviceId, String serviceName) {
         var key = "/services/%s/%s".formatted(serviceName, serviceId.toString());
-        dataSource.delete(key);
+        return dataSource.delete(key);
     }
 
     @Override
-    public void heartBeat(long leaseId) {
-        dataSource.renew(leaseId);
+    public RenewResponse heartBeat(long leaseId) {
+        return dataSource.renew(leaseId);
     }
 }

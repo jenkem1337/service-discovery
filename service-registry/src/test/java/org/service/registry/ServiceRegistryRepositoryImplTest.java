@@ -29,7 +29,7 @@ class ServiceRegistryRepositoryImplTest {
     @Test
     void registerService() {
         final long leaseId = 123456789;
-        when(dataSource.put(any(String.class), any(byte[].class))).thenReturn(new PutResponse(leaseId));
+        when(dataSource.put(any(String.class), any(byte[].class))).thenReturn(new PutResponse("hello", "world", 1,1, leaseId));
         var response = serviceRegistryRepository.register(Service.of(
                 Generators.timeBasedEpochGenerator().generate(),
                 Generators.timeBasedEpochGenerator().generate(),
@@ -43,10 +43,12 @@ class ServiceRegistryRepositoryImplTest {
 
     @Test
     void deregisterService() {
-        doNothing().when(dataSource).delete(any(String.class));
         UUID serviceId = Generators.timeBasedEpochGenerator().generate();
-        serviceRegistryRepository.deregister(serviceId,"user-service");
-        verify(dataSource, times(1)).delete("/services/user-service/%s".formatted(serviceId.toString()));
+        var key = "/services/user-service/%s".formatted(serviceId.toString());
+        when(dataSource.delete(any(String.class))).thenReturn(new DeleteResponse(key,1));
+        var response = serviceRegistryRepository.deregister(serviceId,"user-service");
+        verify(dataSource, times(1)).delete(key);
+        assertEquals(key, response.key());
     }
 
     @Test
@@ -60,8 +62,8 @@ class ServiceRegistryRepositoryImplTest {
 
     @Test
     void sendHeartBeatMessage(){
-        doNothing().when(dataSource).renew(any(long.class));
         final long leaseId = 123456789;
+        when(dataSource.renew(any(long.class))).thenReturn(new RenewResponse(leaseId, 10, 1));
         serviceRegistryRepository.heartBeat(leaseId);
         verify(dataSource, times(1)).renew(leaseId);
     }

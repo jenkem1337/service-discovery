@@ -30,7 +30,7 @@ public class ServiceRegistryServiceImplTest {
     void saveServiceObject(){
         var command = new RegisterCommand(Generators.timeBasedEpochGenerator().generate(),"service-1","123.123.123.123",3434,"http");
 
-        when(serviceRegistryRepository.register(any(Service.class))).thenReturn(new PutResponse(12341213));
+        when(serviceRegistryRepository.register(any(Service.class))).thenReturn(new PutResponse("hello", "world", 1,1, 12341213));
 
         var response = serviceRegistryService.register(command);
 
@@ -40,15 +40,17 @@ public class ServiceRegistryServiceImplTest {
     @Test
     void deregisterService(){
         var serviceId = Generators.timeBasedEpochGenerator().generate();
-        doNothing().when(serviceRegistryRepository).deregister(any(UUID.class), any(String.class));
-        serviceRegistryService.deregister(new DeregisterCommand(serviceId, "user-service"));
-        verify(serviceRegistryRepository, times(1)).deregister(serviceId, "user-service");
+        var serviceName = "user-service";
+        var key = "/services/%s/%s".formatted(serviceName, serviceId.toString());
+        when(serviceRegistryRepository.deregister(any(UUID.class), any(String.class))).thenReturn(new DeleteResponse(key,1));
+        serviceRegistryService.deregister(new DeregisterCommand(serviceId, serviceName));
+        verify(serviceRegistryRepository, times(1)).deregister(serviceId, serviceName);
     }
 
     @Test
     void sendHeartBeatMessage(){
         final long leaseId = 123456789;
-        doNothing().when(serviceRegistryRepository).heartBeat(any(long.class));
+        when(serviceRegistryRepository.heartBeat(any(long.class))).thenReturn(new RenewResponse(leaseId, 10, 2));
         serviceRegistryService.heartBeat(new HeartBeatCommand(leaseId));
         verify(serviceRegistryRepository, times(1)).heartBeat(leaseId);
     }
@@ -57,11 +59,11 @@ public class ServiceRegistryServiceImplTest {
     void firstRegisterServiceAfterSendHeartBeatMessage() {
         var registerCommand = new RegisterCommand(Generators.timeBasedEpochGenerator().generate(),"service-1","123.123.123.123",3434,"http");
         final long leaseId = 123456789;
-        when(serviceRegistryRepository.register(any(Service.class))).thenReturn(new PutResponse(leaseId));
+        when(serviceRegistryRepository.register(any(Service.class))).thenReturn(new PutResponse("hello", "world", 1,1, leaseId));
         var serviceRegisteredResponse = serviceRegistryService.register(registerCommand);
         assertEquals(leaseId, serviceRegisteredResponse.leaseId());
 
-        doNothing().when(serviceRegistryRepository).heartBeat(any(long.class));
+        when(serviceRegistryRepository.heartBeat(any(long.class))).thenReturn(new RenewResponse(leaseId, 10, 2));
         serviceRegistryService.heartBeat(new HeartBeatCommand(serviceRegisteredResponse.leaseId()));
         verify(serviceRegistryRepository, times(1)).heartBeat(serviceRegisteredResponse.leaseId());
 
