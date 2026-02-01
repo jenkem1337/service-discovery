@@ -6,12 +6,14 @@ import io.etcd.jetcd.KV;
 import io.etcd.jetcd.Lease;
 import io.etcd.jetcd.options.PutOption;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
 
 public class EtcdRegistryDataSource implements RegistryDataSource{
     private final Client etcdClient;
     private final Lease leaseClient;
     private final KV keyValueClient;
+    public static int TTL = 10;
     public EtcdRegistryDataSource(Client etcdClient) {
         this.etcdClient = etcdClient;
         this.leaseClient = this.etcdClient.getLeaseClient();
@@ -19,19 +21,19 @@ public class EtcdRegistryDataSource implements RegistryDataSource{
     }
 
     @Override
-    public GetResponse get(String key) {
-        return new GetResponse();
-    }
-
-    @Override
     public PutResponse put(String key, String value) {
         try {
-            var leaseId = leaseClient.grant(10).get().getID();
+            var leaseId = leaseClient.grant(TTL).get().getID();
             ByteSequence $key = ByteSequence.from(key.getBytes());
             ByteSequence $value = ByteSequence.from(value.getBytes());
 
-            keyValueClient.put($key, $value, PutOption.builder().withLeaseId(leaseId).build()).get();
-            return new PutResponse(leaseId);
+            var putResponse = keyValueClient.put($key, $value, PutOption.builder().withLeaseId(leaseId).build()).get();
+            return new PutResponse(
+                    key,
+                    value,
+                    putResponse.getPrevKv().getVersion(),
+                    putResponse.getHeader().getRevision(),
+                    leaseId);
         } catch (InterruptedException | ExecutionException e) {
             throw new DataSourceException(e.toString());
         }
@@ -40,30 +42,41 @@ public class EtcdRegistryDataSource implements RegistryDataSource{
     @Override
     public PutResponse put(String key, byte[] value) {
         try {
-            var leaseId = leaseClient.grant(10).get().getID();
+            var leaseId = leaseClient.grant(TTL).get().getID();
             ByteSequence $key = ByteSequence.from(key.getBytes());
             ByteSequence $value = ByteSequence.from(value);
 
-            var response = keyValueClient.put($key, $value, PutOption.builder().withLeaseId(leaseId).build()).get();
-            return new PutResponse(response.getPrevKv().getLease());
+            var putResponse = keyValueClient.put($key, $value, PutOption.builder().withLeaseId(leaseId).build()).get();
+            return new PutResponse(
+                    key,
+                    $value.toString(StandardCharsets.UTF_8),
+                    putResponse.getPrevKv().getVersion(),
+                    putResponse.getHeader().getRevision(),
+                    leaseId);
         } catch (InterruptedException | ExecutionException e) {
             throw new DataSourceException(e.toString());
         }
     }
 
     @Override
-    public void delete(String key) {
+    public DeleteResponse delete(String key) {
         try{
-            keyValueClient.delete(ByteSequence.from(key.getBytes())).get();
+            var response = keyValueClient.delete(ByteSequence.from(key.getBytes())).get();
+            var deleteList = response.getPrevKvs();
+            return new DeleteResponse(
+                    key,
+                    response.getHeader().getRevision()
+            );
         } catch (ExecutionException | InterruptedException e) {
             throw new DataSourceException(e.toString());
         }
     }
 
     @Override
-    public void renew(long leaseId) {
+    public RenewResponse renew(long leaseId) {
         try {
-            this.leaseClient.keepAliveOnce(leaseId).get();
+            var response = this.leaseClient.keepAliveOnce(leaseId).get();
+            return new RenewResponse(response.getID(), response.getTTL(), response.getHeader().getRevision());
         } catch (InterruptedException | ExecutionException e) {
             throw new DataSourceException(e.toString());
         }
