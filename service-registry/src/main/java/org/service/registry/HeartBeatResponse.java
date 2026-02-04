@@ -1,4 +1,4 @@
 package org.service.registry;
 
-public record HeartBeatResponse() {
+public record HeartBeatResponse(long leaseId) {
 }
