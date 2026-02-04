@@ -33,8 +33,8 @@ public class ServiceRegistryServiceImpl implements ServiceRegistryService{
 
     @Override
     public HeartBeatResponse heartBeat(HeartBeatCommand heartBeatCommand) {
-        serviceRegistryRepository.heartBeat(heartBeatCommand.leaseId());
-        return new HeartBeatResponse();
+        var heartBeatResponse = serviceRegistryRepository.heartBeat(heartBeatCommand.leaseId());
+        return new HeartBeatResponse(heartBeatResponse.leaseId());
     }
 }
 
