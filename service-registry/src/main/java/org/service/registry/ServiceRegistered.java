@@ -1,4 +1,4 @@
 package org.service.registry;
 
-public record ServiceRegistered(long leaseId) {
+public record ServiceRegistered(Service service, long leaseId) {
 }
