@@ -5,6 +5,7 @@ import com.dslplatform.json.DslJson;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class ServiceRegistryRepositoryImpl implements ServiceRegistryRepository{
     private static final DslJson<Object> JSON = new DslJson<>();
@@ -41,6 +42,11 @@ public class ServiceRegistryRepositoryImpl implements ServiceRegistryRepository{
     public DeleteResponse deregister(UUID serviceId, String serviceName) {
         var key = "/services/%s/%s".formatted(serviceName, serviceId.toString());
         return dataSource.delete(key);
+    }
+
+    @Override
+    public WatchResponse watch(String key, Consumer watchCallback) {
+        return dataSource.watch(key, watchCallback);
     }
 
     @Override

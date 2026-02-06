@@ -1,23 +1,24 @@
 package org.service.registry;
 
-import io.etcd.jetcd.ByteSequence;
-import io.etcd.jetcd.Client;
-import io.etcd.jetcd.KV;
-import io.etcd.jetcd.Lease;
+import io.etcd.jetcd.*;
+import io.etcd.jetcd.options.WatchOption;
+import io.etcd.jetcd.watch.WatchResponse;
 import io.etcd.jetcd.options.PutOption;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
-
+import java.util.function.Consumer;
 public class EtcdRegistryDataSource implements RegistryDataSource{
     private final Client etcdClient;
     private final Lease leaseClient;
     private final KV keyValueClient;
+    private final Watch watchClient;
     public static int TTL = 10;
     public EtcdRegistryDataSource(Client etcdClient) {
         this.etcdClient = etcdClient;
         this.leaseClient = this.etcdClient.getLeaseClient();
         this.keyValueClient = this.etcdClient.getKVClient();
+        this.watchClient = this.etcdClient.getWatchClient();
     }
 
     @Override
@@ -80,5 +81,12 @@ public class EtcdRegistryDataSource implements RegistryDataSource{
         } catch (InterruptedException | ExecutionException e) {
             throw new DataSourceException(e.toString());
         }
+    }
+
+    @Override
+    public org.service.registry.WatchResponse watch(String key, Consumer watchResponseConsumer){
+        var watchOption = WatchOption.builder().withPrevKV(true).build();
+        var watcher = watchClient.watch(ByteSequence.from(key.getBytes()), watchOption, (Consumer<WatchResponse>)watchResponseConsumer);
+        return new org.service.registry.WatchResponse<>(watcher);
     }
 }
