@@ -22,7 +22,7 @@ public class ServiceRegistryServiceImpl implements ServiceRegistryService{
                 Instant.now()
         );
         var response = serviceRegistryRepository.register(service);
-        return new ServiceRegistered(response.leaseId());
+        return new ServiceRegistered(service, response.leaseId());
     }
 
     @Override
@@ -35,6 +35,11 @@ public class ServiceRegistryServiceImpl implements ServiceRegistryService{
     public HeartBeatResponse heartBeat(HeartBeatCommand heartBeatCommand) {
         var heartBeatResponse = serviceRegistryRepository.heartBeat(heartBeatCommand.leaseId());
         return new HeartBeatResponse(heartBeatResponse.leaseId());
+    }
+
+    @Override
+    public WatchResponse watch(WatchRequest watchRequest) {
+        return serviceRegistryRepository.watch(watchRequest.key(), watchRequest.watchCallback());
     }
 }
 
