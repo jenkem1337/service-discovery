@@ -22,6 +22,7 @@ public class ServiceRegistryServiceImpl implements ServiceRegistryService{
                 Instant.now()
         );
         var response = serviceRegistryRepository.register(service);
+        service.assignLeaseId(response.leaseId());
         return new ServiceRegistered(service, response.leaseId());
     }
 

@@ -10,6 +10,7 @@ public class Service {
     private IpAddress ipAddress;
     private Port portNumber;
     private Protocol protocol;
+    private long leaseId;
     private final Instant creationDate;
 
     private Service(UUID id, UUID serviceId,  Name serviceName, IpAddress ipAddress, Port portNumber, Protocol protocol, Instant creationDate) {
@@ -51,6 +52,10 @@ public class Service {
 
     public Instant creationDate() {
         return creationDate;
+    }
+
+    public void assignLeaseId(long leaseId) {
+        this.leaseId = leaseId;
     }
 
 }
