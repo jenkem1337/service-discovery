@@ -8,13 +8,13 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public class ServiceRegistryRepositoryImpl implements ServiceRegistryRepository{
-    private static final DslJson<Object> JSON = new DslJson<>();
+    private final DslJson<Object> JSON = new DslJson<>();
     private final RegistryDataSource dataSource;
 
     public ServiceRegistryRepositoryImpl(final RegistryDataSource dataSource) {
         this.dataSource = dataSource;
     }
-    private static byte[] serialize(ServiceJsonDataMapper serviceJsonDataMapper) {
+    private byte[] serialize(ServiceJsonDataMapper serviceJsonDataMapper) {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream(1024)) {
             JSON.serialize(serviceJsonDataMapper, os);
             return os.toByteArray();
