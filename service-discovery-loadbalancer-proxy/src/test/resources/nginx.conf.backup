@@ -1,0 +1,31 @@
+worker_processes auto;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+
+    upstream backend_cluster {
+        server 123.123.123.124:9090;
+		server 123.123.123.123:9090;
+		server 123.123.123.125:9090;
+		
+    }
+
+    server {
+        listen 80;
+        server_name myapp.local;
+
+        location / {
+            proxy_pass http://backend_cluster;
+
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+            proxy_connect_timeout 5s;
+            proxy_read_timeout 30s;
+        }
+    }
+}
