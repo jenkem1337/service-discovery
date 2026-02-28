@@ -30,6 +30,31 @@ public class DockerContainerNginxUpdater implements LoadBalancerUpdater{
         this.dockerClient = dockerClient;
     }
 
+    @Override
+    public void onUpdateCommand(UpdateCommand updateCommand) {
+        switch (updateCommand){
+            case UpdateCommand.PutCommand putCommand  -> {
+                try {
+                    put(putCommand);
+                } catch (IOException e) {
+                    rollback(e);
+                } finally {
+                    servicesStringBuilder.setLength(0);
+                }
+            }
+            case UpdateCommand.DeleteCommand deleteCommand -> {
+                try {
+                    delete(deleteCommand);
+                } catch (IOException e) {
+                    rollback(e);
+                } finally {
+                    servicesStringBuilder.setLength(0);
+                }
+            }
+            default -> throw new IllegalArgumentException("Unknown command");
+        }
+    }
+
     private void put(UpdateCommand.PutCommand putCommand) throws IOException {
         Service service = deserializeToService(putCommand.value().toString().getBytes(StandardCharsets.UTF_8));
         if(services.containsKey(service.serviceId())){
@@ -42,7 +67,7 @@ public class DockerContainerNginxUpdater implements LoadBalancerUpdater{
         if(!isValid) {
             throw new IllegalStateException("Validation Failed !");
         }
-        servicesStringBuilder.setLength(0);
+//        servicesStringBuilder.setLength(0);
 
     }
     private void delete(UpdateCommand.DeleteCommand deleteCommand) throws IOException {
@@ -60,36 +85,76 @@ public class DockerContainerNginxUpdater implements LoadBalancerUpdater{
         if(!isValid) {
             throw new IllegalStateException("Validation Failed !");
         }
+//        servicesStringBuilder.setLength(0);
     }
-    @Override
-    public void onUpdateCommand(UpdateCommand updateCommand) {
-        switch (updateCommand){
-            case UpdateCommand.PutCommand putCommand  -> {
-                try {
-                    put(putCommand);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
 
+    private void rollback(IOException e) {
+        try {
+            Path actualPath = Path.of((String) configuration.get("nginx.configuration.actual"));
+            Path backupPath = Path.of((String) configuration.get("nginx.configuration.backup"));
+
+            if (Files.exists(backupPath)) {
+                Files.move(
+                        backupPath,
+                        actualPath,
+                        StandardCopyOption.REPLACE_EXISTING,
+                        StandardCopyOption.ATOMIC_MOVE
+                );
             }
-            case UpdateCommand.DeleteCommand deleteCommand -> {
-                try {
-                    delete(deleteCommand);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            default -> throw new IllegalArgumentException("Unknown command");
+        } catch (Exception rollbackEx) {
+            System.err.println(rollbackEx.getMessage());
+
         }
+
+        System.err.println("Config update failed. Rollback attempted.");
+        System.err.println(Arrays.toString(e.getStackTrace()));
+
     }
+
     private Service deserializeToService(byte[] json) throws IOException {
         var serviceJsonPOJO =  dslJson.deserialize(ServiceJsonDataMapper.class, json, json.length);
         assert serviceJsonPOJO != null;
         return new Service(serviceJsonPOJO.serviceId, serviceJsonPOJO.serviceName, serviceJsonPOJO.ip, serviceJsonPOJO.port, serviceJsonPOJO.protocol);
     }
 
-    private void updateConfiguration(Map<String, Service> services) throws IOException {
-        var servicesImmutableSnapshot = List.copyOf(services.values());
+    private void updateConfigurationWhenServiceListEmpty() throws IOException {
+        servicesStringBuilder.append("server 127.0.0.1:65535;");
+        Path templatePath = Path.of((String) configuration.get("nginx.configuration.template"));
+        Path actualPath = Path.of((String) configuration.get("nginx.configuration.actual"));
+        Path backupPath = Path.of((String) configuration.get("nginx.configuration.backup"));
+        Path tempPath = actualPath.resolveSibling(actualPath.getFileName() + ".tmp");
+
+        var nginxTemplate = Files.readString(templatePath);
+        nginxTemplate = nginxTemplate.replace("{{Services}}", servicesStringBuilder.toString());
+
+        try (var channel = FileChannel.open(
+                tempPath,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.WRITE,
+                StandardOpenOption.TRUNCATE_EXISTING)) {
+
+            channel.write(StandardCharsets.UTF_8.encode(nginxTemplate));
+            channel.force(true);
+        }
+
+        if (Files.exists(actualPath)) {
+            Files.move(
+                    actualPath,
+                    backupPath,
+                    StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.ATOMIC_MOVE
+            );
+        }
+
+        Files.move(
+                tempPath,
+                actualPath,
+                StandardCopyOption.REPLACE_EXISTING,
+                StandardCopyOption.ATOMIC_MOVE
+        );
+
+    }
+    private void updateConfigurationWhenServiceListNotEmpty(List<Service> servicesImmutableSnapshot) throws IOException {
         for (Service s : servicesImmutableSnapshot) {
             servicesStringBuilder
                     .append("server")
@@ -136,6 +201,15 @@ public class DockerContainerNginxUpdater implements LoadBalancerUpdater{
                 StandardCopyOption.ATOMIC_MOVE
         );
 
+    }
+    private void updateConfiguration(Map<String, Service> services) throws IOException {
+        var servicesImmutableSnapshot = List.copyOf(services.values());
+
+        if(servicesImmutableSnapshot.isEmpty()) {
+            updateConfigurationWhenServiceListEmpty();
+        } else {
+            updateConfigurationWhenServiceListNotEmpty(servicesImmutableSnapshot);
+        }
     }
 
     public boolean validateAndReload() {
