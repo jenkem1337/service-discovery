@@ -1,14 +1,9 @@
 package org.service.discovery.loadbalancer.proxy;
 
 import com.dslplatform.json.DslJson;
-import com.github.dockerjava.core.DockerClientBuilder;
-import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
 import io.etcd.jetcd.ByteSequence;
 import io.etcd.jetcd.Client;
-import io.etcd.jetcd.ClientBuilder;
 import io.etcd.jetcd.options.WatchOption;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.DockerClientFactory;
@@ -18,17 +13,16 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
-import org.testcontainers.utility.MountableFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -260,6 +254,97 @@ class DockerContainerNginxUpdaterTest {
         );
         assertTrue(
                 content.contains("server 123.123.123.125:9090;"),
+                "Container içindeki nginx.conf expected server entry içermiyor"
+        );
+        watcher.close();
+    }
+
+    @Test
+    void shouldReloadSuccess_WhenAllInstanceRemoved() throws IOException, InterruptedException, ExecutionException {
+        var watcher =  etcdClient.getWatchClient().watch(ByteSequence.from("/services/user-service".getBytes()), WatchOption.builder().isPrefix(true).withPrevKV(true).build(), serviceEventListener);
+
+        var service = new ServiceJsonDataMapper(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                "user-service",
+                "123.123.123.123",
+                9090,
+                "http",
+                Instant.now().toString()
+        );
+        var service2 = new ServiceJsonDataMapper(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                "user-service",
+                "123.123.123.124",
+                9090,
+                "http",
+                Instant.now().toString()
+        );
+        var service3 = new ServiceJsonDataMapper(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                "user-service",
+                "123.123.123.125",
+                9090,
+                "http",
+                Instant.now().toString()
+        );
+
+        var os = new ByteArrayOutputStream(1024);
+
+        dslJson.serialize(service, os);
+        var instanceJson = os.toByteArray();
+
+        os.reset();
+
+        dslJson.serialize(service2, os);
+        var instanceJson2 = os.toByteArray();
+
+        os.reset();
+
+        dslJson.serialize(service3, os);
+        var instanceJson3 = os.toByteArray();
+        var kv = etcdClient.getKVClient();
+        var key = ByteSequence.from("/services/user-service/%s".formatted(service.serviceId).getBytes());
+        var value = ByteSequence.from(instanceJson);
+        kv.put(key, value).get();
+
+        var key2 = ByteSequence.from("/services/user-service/%s".formatted(service2.serviceId).getBytes());
+        var value2 = ByteSequence.from(instanceJson2);
+        kv.put(key2, value2).get();
+
+        var key3 = ByteSequence.from("/services/user-service/%s".formatted(service3.serviceId).getBytes());
+        var value3 = ByteSequence.from(instanceJson3);
+        kv.put(key3, value3).get();
+
+        kv.delete(key3).get();
+        kv.delete(key2).get();
+        kv.delete(key).get();
+
+        Thread.sleep(10_000);
+        var result = nginxContainer.execInContainer(
+                "cat",
+                "/opt/nginx/nginx.conf"
+        );
+
+        String content = result.getStdout();
+
+        assertFalse(
+                content.contains("server 123.123.123.123:9090;"),
+                "Container içindeki nginx.conf expected server entry içermiyor"
+        );
+        assertFalse(
+                content.contains("server 123.123.123.124:9090;"),
+                "Container içindeki nginx.conf expected server entry içeriyor"
+        );
+        assertFalse(
+                content.contains("server 123.123.123.125:9090;"),
+                "Container içindeki nginx.conf expected server entry içermiyor"
+        );
+
+        assertTrue(
+                content.contains("server 127.0.0.1:65535;"),
                 "Container içindeki nginx.conf expected server entry içermiyor"
         );
         watcher.close();
