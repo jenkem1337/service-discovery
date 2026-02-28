@@ -7,9 +7,7 @@ events {
 http {
 
     upstream backend_cluster {
-        server 123.123.123.124:9090;
-		server 123.123.123.123:9090;
-		server 123.123.123.125:9090;
+        server 123.123.123.123:9090;
 		
     }
 
