@@ -1,4 +1,37 @@
 services:
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ../service-discovery-loadbalancer-proxy/src/main/resources:/opt/nginx:rw
+    command: ["nginx", "-c", "/opt/nginx/nginx.conf", "-g", "daemon off;"]
+    networks:
+      - spring-app-network
+
+  proxy-sidecar:
+    build:
+      context: ../
+      dockerfile: ./service-discovery-loadbalancer-proxy/Dockerfile
+
+    volumes:
+    - ../service-discovery-loadbalancer-proxy/src/main/resources:/opt/nginx:rw
+    - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      ETCD_ENDPOINT: http://etcd:2379
+      LOAD_BALANCER_CONTAINER_NAME: nginx
+      SERVICE_KEY: /services/user-service/
+      LOAD_BALANCER_TEMPLATE_FILE : /opt/nginx/nginx.conf.template
+      LOAD_BALANCER_BACKUP_FILE: /opt/nginx/nginx.conf.backup
+      LOAD_BALANCER_ACTUAL_FILE: /opt/nginx/nginx.conf
+    networks:
+      spring-app-network:
+
+
+
+
   spring_app:
     build:
       context: ../
@@ -10,7 +43,7 @@ services:
     networks:
       spring-app-network:
     deploy:
-      replicas: 3
+      replicas: 5
     depends_on:
       - etcd
       - postgres
@@ -53,5 +86,6 @@ services:
 volumes:
   user-service-volume:
   etcd-data:
+
 networks:
   spring-app-network:
