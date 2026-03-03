@@ -5,10 +5,11 @@ import java.util.Queue;
 public class LoadBalancerUpdaterQueueExecutor {
     private final Queue<UpdateCommand> updateCommandQueue;
     private final LoadBalancerUpdater loadBalancerUpdater;
-    private final Runnable eventLoop;
+    private final UpdaterQueueCallback eventLoop;
     private Thread executorThread;
+    private volatile boolean isRunning = true;
 
-    public LoadBalancerUpdaterQueueExecutor(Queue<UpdateCommand> updateCommandQueue, LoadBalancerUpdater loadBalancerUpdater, Runnable eventLoop ) {
+    public LoadBalancerUpdaterQueueExecutor(Queue<UpdateCommand> updateCommandQueue, LoadBalancerUpdater loadBalancerUpdater, UpdaterQueueCallback eventLoop ) {
         this.updateCommandQueue = updateCommandQueue;
         this.loadBalancerUpdater = loadBalancerUpdater;
         this.eventLoop = eventLoop;
@@ -16,11 +17,27 @@ public class LoadBalancerUpdaterQueueExecutor {
 
 
     public void assignEventLoopToPlatformThread(){
-        executorThread = Thread.ofPlatform().unstarted(eventLoop);
+        executorThread = Thread.ofPlatform().unstarted(() -> {
+            while(isRunning){
+                try {
+                    eventLoop.apply(updateCommandQueue, loadBalancerUpdater);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     public void assignEventLoopToVirtualThread() {
-        executorThread = Thread.ofVirtual().unstarted(eventLoop);
+        executorThread = Thread.ofVirtual().unstarted(() -> {
+            while(isRunning){
+                try {
+                    eventLoop.apply(updateCommandQueue, loadBalancerUpdater);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     public void start(){
@@ -28,6 +45,7 @@ public class LoadBalancerUpdaterQueueExecutor {
     }
 
     public void stop() {
+        isRunning = false;
         executorThread.interrupt();
     }
 }
