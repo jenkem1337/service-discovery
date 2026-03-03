@@ -73,17 +73,15 @@ class DockerContainerNginxUpdaterTest {
         conf.setProperty("nginx.configuration.backup","src/test/resources/nginx.conf.backup");
 
         updateCommandQueue = new ConcurrentLinkedQueue<>();
-        nginxUpdater = new DockerContainerNginxUpdater(conf, "test-nginx", DockerClientFactory.instance().client());
+        nginxUpdater = new DockerContainerNginxUpdater(new ServiceList(null, 0), conf, "test-nginx", DockerClientFactory.instance().client());
         serviceEventListener = new ServiceEventListener("/services/user-service", updateCommandQueue);
-        queueExecutor = new LoadBalancerUpdaterQueueExecutor(updateCommandQueue, nginxUpdater, () -> {
-           while(true) {
-               UpdateCommand cmd = updateCommandQueue.poll();
+        queueExecutor = new LoadBalancerUpdaterQueueExecutor(updateCommandQueue, nginxUpdater, (queue, loadBalancerUpdater) -> {
+               UpdateCommand cmd = queue.poll();
                if(cmd != null) {
-                   nginxUpdater.onUpdateCommand(cmd);
+                   loadBalancerUpdater.onUpdateCommand(cmd);
                } else {
                    Thread.yield();
                }
-           }
         });
         queueExecutor.assignEventLoopToPlatformThread();
         queueExecutor.start();
