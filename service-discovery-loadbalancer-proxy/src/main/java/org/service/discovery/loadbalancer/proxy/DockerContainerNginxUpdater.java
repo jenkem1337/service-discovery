@@ -24,10 +24,21 @@ public class DockerContainerNginxUpdater implements LoadBalancerUpdater{
     private final Properties configuration;
     private final DockerClient dockerClient;
     private final String containerName;
-    public DockerContainerNginxUpdater(Properties configuration, String containerName, DockerClient dockerClient) {
+    public DockerContainerNginxUpdater(ServiceList serviceList, Properties configuration, String containerName, DockerClient dockerClient) {
         this.configuration = configuration;
         this.containerName = containerName;
         this.dockerClient = dockerClient;
+        if(serviceList.serviceCount() > 0) {
+            serviceList.serviceList().stream()
+                    .forEach((item) -> {
+                        try {
+                            Service service = deserializeToService(item.getValue().toString(StandardCharsets.UTF_8).getBytes());
+                            services.put(service.serviceId(), service);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+        }
     }
 
     @Override
