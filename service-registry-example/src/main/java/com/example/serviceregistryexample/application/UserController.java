@@ -11,7 +11,7 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     private final UserRepository userRepository;
-
+    private record ContainerId(String id){}
     public UserController(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -32,6 +32,11 @@ public class UserController {
 
         var savedUser = userRepository.saveAndFlush(user);
         return ResponseEntity.ok(savedUser);
+    }
+
+    @GetMapping(path = "/container-id")
+    public ResponseEntity<ContainerId> showContainerId() {
+        return ResponseEntity.ok(new ContainerId(System.getenv("HOSTNAME")));
     }
 
 }
