@@ -21,6 +21,7 @@ public class ServiceEventListener implements Consumer<WatchResponse> {
     @Override
     public void accept(WatchResponse watchResponse) {
         var events = watchResponse.getEvents();
+
         for(WatchEvent event : events) {
             if(event.getEventType().equals(WatchEvent.EventType.DELETE)){
                 var prevKV = event.getPrevKV();
