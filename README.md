@@ -27,7 +27,6 @@ The purpose of this project is to build a general-purpose, server-side service d
 
 - Registry backed by etcd, which scales horizontally
 - Service TTL is 10 seconds — if a heartbeat is missed, the instance is considered dead and the load balancer is updated
-- Low GC latency (off-heap and allocation-conscious design where applicable)
 
 ## Use Cases
 
